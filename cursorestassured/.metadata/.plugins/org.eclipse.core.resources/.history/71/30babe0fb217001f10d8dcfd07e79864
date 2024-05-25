@@ -1,0 +1,15 @@
+package Utils;
+
+public class Movimentacao {
+
+	private Integer id;
+	private String Descricao;
+	private String envolvido;
+	private String tipo;
+	private String data_transacao;
+	private String data_pagamento;
+	private float valor;
+	private Boolean status;
+	private Integer conta_id;
+	private Integer usuario_id;
+}

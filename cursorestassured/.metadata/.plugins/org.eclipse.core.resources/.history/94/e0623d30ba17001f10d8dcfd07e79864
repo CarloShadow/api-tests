@@ -1,0 +1,176 @@
+package Tests;
+
+import static io.restassured.RestAssured.given;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.*;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import Utils.Movimentacao;
+import core.BaseTest;
+import io.restassured.http.ContentType;
+
+public class BarrigaAPITests extends BaseTest{
+	
+	private String TOKEN;
+	
+	@Before
+	public void login() {
+		Map<String, String> login = new HashMap<String, String>();
+		login.put("email", "cjunior.66@icloud.com");
+		login.put("senha", "123456789");
+		
+		
+		TOKEN = given()
+			.body(login)
+		.when()
+			.post("/signin")
+		.then()
+			.statusCode(200)
+			.extract().path("token")
+		;
+	}
+	
+	public void testSetup() {
+		setup();
+	}
+	
+	@Test
+	public void naoDeveAcessarAPISemToken() {
+
+		given()
+	.when()
+		.get("/contas")
+	.then()
+		.statusCode(401)
+	;
+		
+	}
+	
+
+	@Test
+	public void deveIncluirUmaContaComSucesso() {
+
+		given()
+			.header("Authorization", "JWT " + TOKEN)
+			.body("{\"nome\": \"Carlos5\"}")
+		.when()
+			.post("/contas")
+		.then()
+			.log().all()
+			.statusCode(201)
+			.body("nome", is("Carlos5"))
+		;
+
+	}
+	
+	@Test
+	public void deveAlterarUmaContaComSucesso() {
+
+		Map<String, String> login = new HashMap<String, String>();
+		login.put("email", "cjunior.66@icloud.com");
+		login.put("senha", "123456789");
+		
+		
+		String token = given()
+			.body(login)
+		.when()
+			.post("/signin")
+		.then()
+			.statusCode(200)
+			.extract().path("token")
+		;
+		
+		given()
+			.header("Authorization", "JWT " + token)
+			.body("{\"nome\": \"CarlosAlterado\"}")
+		.when()
+			.put("/contas/2126928")
+		.then()
+			.statusCode(200)
+			.body("nome", is("CarlosAlterado"))
+		;
+
+	}
+	
+	@Test
+	public void naoDeveIncluirUmaContaComNomeRepetido() {
+
+		Map<String, String> login = new HashMap<String, String>();
+		login.put("email", "cjunior.66@icloud.com");
+		login.put("senha", "123456789");
+		
+		
+		String token = given()
+			.body(login)
+		.when()
+			.post("/signin")
+		.then()
+			.statusCode(200)
+			.extract().path("token")
+		;
+		
+		given()
+			.header("Authorization", "JWT " + token)
+			.body("{\"nome\": \"Carlos1\"}")
+		.when()
+			.post("/contas")
+		.then()
+			.statusCode(400)
+			.body("error", is("Já existe uma conta com esse nome!"))
+		;
+
+	}
+	
+	@Test
+	public void deveInserirMovimentacaoComSucesso() {
+
+		Movimentacao mov = new Movimentacao();
+		mov.setConta_id(2127006);
+		mov.setDescricao("Descricao da movimentacao");
+		mov.setEnvolvido("Carlos Inc.");
+		mov.setTipo("REC");
+		mov.setData_transacao("19/05/2024");
+		mov.setData_pagamento("20/05/2024");
+		mov.setValor(10000f);
+		mov.setStatus(true);
+		
+		Map<String, String> login = new HashMap<String, String>();
+		login.put("email", "cjunior.66@icloud.com");
+		login.put("senha", "123456789");
+		
+		
+		String token = given()
+			.body(login)
+		.when()
+			.post("/signin")
+		.then()
+			.statusCode(200)
+			.extract().path("token")
+		;
+		
+		given()
+			.header("Authorization", "JWT " + token)
+			.body(mov)
+		
+		.when()
+			.post("/transacoes")
+		.then()
+			.statusCode(201)
+//			.body("conta_id", is("2127006"))
+//			.body("descricao", is("TESTE TRANSACOES"))
+//			.body("envolvido", is("Carlos"))
+//			.body("tipo", is("REC"))
+//			.body("data_transacao", is("20/06/2024"))
+//			.body("data_pagamento", is("20/06/2024"))
+//			.body("valor", is(200000.00f))
+//			.body("status", is(true))
+		;
+
+	}
+	
+}

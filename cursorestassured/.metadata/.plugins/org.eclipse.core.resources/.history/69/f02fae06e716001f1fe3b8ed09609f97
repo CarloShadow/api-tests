@@ -1,0 +1,22 @@
+package rest.Desafio;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
+import org.junit.Test;
+
+public class DesafioClasse {
+
+	@Test
+	public void naoDeveAcessarAPISemToken() {
+
+		given()
+		.log().all()
+	.when()
+		.get("http://seubarriga.wcaquino.me/contas")
+	.then()
+		.log().all()
+		.statusCode(404)
+	;
+	}
+}

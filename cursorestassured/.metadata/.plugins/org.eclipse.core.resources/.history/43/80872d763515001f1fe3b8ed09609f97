@@ -1,0 +1,9 @@
+package rest;
+
+public class User {
+	
+	private String name;
+	private Interger age;
+	private Double salary;
+
+}

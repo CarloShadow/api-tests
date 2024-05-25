@@ -1,0 +1,16 @@
+package rest;
+
+import org.junit.Test;
+import static io.restassured.RestAssured.given;
+
+public class VerbosTest {
+
+	@Test
+	public void deveSalvarUsuario() {
+		given()
+		.when()
+		.then()
+		;
+	}
+	
+}

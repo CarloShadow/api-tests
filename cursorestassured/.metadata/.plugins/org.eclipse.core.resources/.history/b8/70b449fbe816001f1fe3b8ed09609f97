@@ -1,0 +1,63 @@
+package rest.Desafio;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
+
+import io.restassured.http.ContentType;
+
+public class DesafioClasse {
+
+	@Test
+	public void naoDeveAcessarAPISemToken() {
+
+		given()
+		.log().all()
+	.when()
+		.get("http://barrigarest.wcaquino.me/contas")
+	.then()
+		.log().all()
+		.statusCode(401)
+	;
+		
+	}
+	
+	@Test
+	public void deveIncluirUmaContaComSucesso() {
+
+		Map<String, String> login = new HashMap<String, String>();
+		login.put("email", "cjunior.66@icloud.com");
+		login.put("senha", "123456789");
+		
+		
+		String token = given()
+			.log().all()
+			.body(login)
+			.contentType(ContentType.JSON)
+		.when()
+			.post("http://barrigarest.wcaquino.me/signin")
+		.then()
+			.log().all()
+			.statusCode(200)
+			.extract().path("token")
+		;
+		
+		given()
+			.log().all()
+			.header("Authorization", "JWT " + token)
+			.contentType("application/json")
+			.body("{\"name\", \"Carlos1\"}")
+		.when()
+			.post("http://barrigarest.wcaquino.me/contas")
+		.then()
+			.log().all()
+			.statusCode(200)
+			.body("name", hasItem("Carlos1"))
+		;
+
+	}
+}

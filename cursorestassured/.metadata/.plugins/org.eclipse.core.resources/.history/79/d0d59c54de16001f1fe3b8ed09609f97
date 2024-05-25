@@ -1,0 +1,62 @@
+package rest;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
+
+import org.junit.Test;
+
+public class AuthTest {
+
+	
+	@Test
+	public void deveAcessarSWAPI() {
+		
+		given()
+			.log().all()
+		.when()
+			.get ("https://swapi.dev/api/people/1/")
+		.then()
+			.log().all()
+			.statusCode(200)
+			.body("height", is("172"))
+		;
+	
+	}
+	
+	@Test
+	public void deveAcessarAPIComChave() {
+		
+		given()
+			.log().all()
+			.queryParam("q", "Sao Paulo,BR")
+			.queryParam("appid", "3ac85ea5e0e0829891725b5c8d819e0e")
+			.queryParam("units", "metric")
+			
+		.when()
+			.get ("https://api.openweathermap.org/data/2.5/weather")
+		.then()
+			.log().all()
+			.statusCode(200)
+			.body("name", is("São Paulo"))
+			.body("sys.sunset", greaterThan(171))
+			.body("main.temp", greaterThan(17f))
+		;
+	
+	}
+	
+	@Test
+	public void naoDeveAcessarSemSenha() {
+		
+		given()
+			.log().all()
+			
+		.when()
+			.get ("http://restapi.wcaquino.me/basicauth")
+		.then()
+			.log().all()
+			.statusCode(401)
+		;
+	
+	}
+}
+
